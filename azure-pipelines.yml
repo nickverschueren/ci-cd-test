@@ -13,5 +13,16 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: dotnet build --configuration $(buildConfiguration) WebApplication1/WebApplication1/WebApplication1.csproj
+- script: dotnet publish --configuration $(buildConfiguration) --output $(Build.BinariesDirectory) WebApplication1/WebApplication1/WebApplication1.csproj
   displayName: 'dotnet build $(buildConfiguration)'
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.BinariesDirectory)' 
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip' 
+    replaceExistingArchive: true
+- task: PublishBuildArtifacts@1
+  inputs:
+    artifactName: 'drop'
+    targetPath: '$(Build.ArtifactStagingDirectory)'
